@@ -5,9 +5,11 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.drive.Drive;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -34,6 +36,7 @@ public class MapsActivity extends FragmentActivity implements
 
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
+    private GoogleApiClient.Builder builder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +47,17 @@ public class MapsActivity extends FragmentActivity implements
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
+                .addApi(LocationServices.API)//hook on to this method and check if the argument is LocationServices = local LocationServices.
                 .build();
+
+        builder = new GoogleApiClient.Builder(this);
+        Toast.makeText(this,builder.toString(),Toast.LENGTH_LONG).show();
+
+        GoogleApiClient client = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addApi(Drive.API)
+                .build();
+        client.isConnected();
 
         // Create the LocationRequest object
         mLocationRequest = LocationRequest.create()
@@ -127,6 +139,7 @@ public class MapsActivity extends FragmentActivity implements
 
     @Override
     public void onConnected(Bundle bundle) {
+
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (location == null) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
